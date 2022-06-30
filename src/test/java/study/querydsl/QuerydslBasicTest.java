@@ -125,7 +125,7 @@ public class QuerydslBasicTest {
 
         List<Member> result = queryFactory
                 .selectFrom(member)
-                .where(member.age.eq(100))
+                .where(member.age.eq(200))
                 .orderBy(member.age.desc(), member.username.asc().nullsLast())
                 .fetch();
 
