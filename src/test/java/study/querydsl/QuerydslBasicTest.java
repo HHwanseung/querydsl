@@ -15,9 +15,13 @@ import study.querydsl.entity.QTeam;
 import study.querydsl.entity.Team;
 
 import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.PersistenceContext;
+import javax.persistence.PersistenceUnit;
 
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static study.querydsl.entity.QMember.member;
 import static study.querydsl.entity.QTeam.team;
 
@@ -60,7 +64,7 @@ public class QuerydslBasicTest {
                 .setParameter("username", "member1")
                 .getSingleResult();
 
-        Assertions.assertThat(findMember.getUsername()).isEqualTo("member1");
+        assertThat(findMember.getUsername()).isEqualTo("member1");
     }
 
     @Test
@@ -72,7 +76,7 @@ public class QuerydslBasicTest {
                 .where(member.username.eq("member1"))
                 .fetchOne();
 
-        Assertions.assertThat(findMember.getUsername()).isEqualTo("member1");
+        assertThat(findMember.getUsername()).isEqualTo("member1");
 
     }
 
@@ -84,7 +88,7 @@ public class QuerydslBasicTest {
                         .and(QMember.member.age.eq(10)))
                 .fetchOne();
 
-        Assertions.assertThat(findMember.getUsername()).isEqualTo("member1");
+        assertThat(findMember.getUsername()).isEqualTo("member1");
     }
 
     @Test
@@ -135,9 +139,9 @@ public class QuerydslBasicTest {
         Member member5 = result.get(0);
         Member member6 = result.get(1);
         Member memberNull = result.get(2);
-        Assertions.assertThat(member5.getUsername()).isEqualTo("member5");
-        Assertions.assertThat(member6.getUsername()).isEqualTo("member6");
-        Assertions.assertThat(memberNull.getUsername()).isNull();
+        assertThat(member5.getUsername()).isEqualTo("member5");
+        assertThat(member6.getUsername()).isEqualTo("member6");
+        assertThat(memberNull.getUsername()).isNull();
     }
 
     @Test
@@ -149,7 +153,7 @@ public class QuerydslBasicTest {
                 .limit(2)
                 .fetch();
 
-        Assertions.assertThat(result.size()).isEqualTo(2);
+        assertThat(result.size()).isEqualTo(2);
     }
 
     @Test
@@ -161,10 +165,10 @@ public class QuerydslBasicTest {
                 .limit(2)
                 .fetchResults();
 
-        Assertions.assertThat(queryResult.getTotal()).isEqualTo(4);
-        Assertions.assertThat(queryResult.getLimit()).isEqualTo(2);
-        Assertions.assertThat(queryResult.getOffset()).isEqualTo(1);
-        Assertions.assertThat(queryResult.getResults().size()).isEqualTo(2);
+        assertThat(queryResult.getTotal()).isEqualTo(4);
+        assertThat(queryResult.getLimit()).isEqualTo(2);
+        assertThat(queryResult.getOffset()).isEqualTo(1);
+        assertThat(queryResult.getResults().size()).isEqualTo(2);
 
     }
 
@@ -181,10 +185,10 @@ public class QuerydslBasicTest {
                 .fetch();
 
         Tuple tuple = result.get(0);
-        Assertions.assertThat(tuple.get(member.count())).isEqualTo(4);
-        Assertions.assertThat(tuple.get(member.age.sum())).isEqualTo(100);
-        Assertions.assertThat(tuple.get(member.age.avg())).isEqualTo(25);
-        Assertions.assertThat(tuple.get(member.age.min())).isEqualTo(10);
+        assertThat(tuple.get(member.count())).isEqualTo(4);
+        assertThat(tuple.get(member.age.sum())).isEqualTo(100);
+        assertThat(tuple.get(member.age.avg())).isEqualTo(25);
+        assertThat(tuple.get(member.age.min())).isEqualTo(10);
         
     }
 
@@ -204,11 +208,11 @@ public class QuerydslBasicTest {
         Tuple teamA = result.get(0);
         Tuple teamB = result.get(1);
 
-        Assertions.assertThat(teamA.get(team.name)).isEqualTo("teamA");
-        Assertions.assertThat(teamA.get(member.age.avg())).isEqualTo(15);
+        assertThat(teamA.get(team.name)).isEqualTo("teamA");
+        assertThat(teamA.get(member.age.avg())).isEqualTo(15);
 
-        Assertions.assertThat(teamB.get(team.name)).isEqualTo("teamB");
-        Assertions.assertThat(teamA.get(member.age.avg())).isEqualTo(35);
+        assertThat(teamB.get(team.name)).isEqualTo("teamB");
+        assertThat(teamA.get(member.age.avg())).isEqualTo(35);
 
 
     }
@@ -225,7 +229,7 @@ public class QuerydslBasicTest {
                 .where(team.name.eq("teamA"))
                 .fetch();
 
-        Assertions.assertThat(result)
+        assertThat(result)
                 .extracting("username")
                 .containsExactly("member1", "member2");
     }
@@ -246,7 +250,7 @@ public class QuerydslBasicTest {
                 .where(member.username.eq(team.name))
                 .fetch();
 
-        Assertions.assertThat(result)
+        assertThat(result)
                 .extracting("username")
                 .containsExactly("teamA", "teamB");
     }
@@ -292,6 +296,42 @@ public class QuerydslBasicTest {
         for (Tuple tuple : result) {
             System.out.println("tuple = " + tuple);
         }
+
+    }
+
+    @PersistenceUnit
+    EntityManagerFactory emf;
+
+    @Test
+    public void fetchJoinNo() {
+        em.flush();
+        em.clear();
+
+        Member findMember = queryFactory
+                .selectFrom(member)
+                .where(QMember.member.username.eq("member1"))
+                .fetchOne();
+
+        boolean loaded = emf.getPersistenceUnitUtil().isLoaded(findMember.getTeam());
+        assertThat(loaded).as("페치 조인미적용").isFalse();
+
+
+    }
+
+    @Test
+    public void fetchJoinUse() {
+        em.flush();
+        em.clear();
+
+        Member findMember = queryFactory
+                .selectFrom(member)
+                .join(member.team, team).fetchJoin()
+                .where(QMember.member.username.eq("member1"))
+                .fetchOne();
+
+        boolean loaded = emf.getPersistenceUnitUtil().isLoaded(findMember.getTeam());
+        assertThat(loaded).as("페치 조인미적용").isTrue();
+
 
     }
 
