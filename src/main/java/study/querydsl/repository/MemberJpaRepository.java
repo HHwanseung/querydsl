@@ -84,7 +84,6 @@ public class MemberJpaRepository {
             builder.and(member.age.loe(condition.getAgeLoe()));
         }
 
-
         return queryFactory
                 .select(new QMemberTeamDto(
                         member.id.as("memberId"),
@@ -98,9 +97,15 @@ public class MemberJpaRepository {
                 .fetch();
     }
 
-    public List<Member> searchMember(MemberSearchCondition condition) {
+    public List<MemberTeamDto> search(MemberSearchCondition condition) {
         return queryFactory
-                .selectFrom(member)
+                .select(new QMemberTeamDto(
+                        member.id.as("memberId"),
+                        member.username,
+                        member.age,
+                        team.id.as("teamId"),
+                        team.name.as("teamName")))
+                .from(member)
                 .leftJoin(member.team, team)
                 .where(
                         usernameEq(condition.getUsername()),
@@ -112,8 +117,7 @@ public class MemberJpaRepository {
     }
 
     private BooleanExpression ageBetween(int ageLoe, int ageGoe) {
-        ageGoe(ageLoe).and(ageGoe(ageGoe));
-
+        return ageGoe(ageLoe).and(ageGoe(ageGoe));
     }
 
     private BooleanExpression usernameEq(String username) {
