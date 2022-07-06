@@ -30,12 +30,11 @@ class MemberJpaRepositoryTest {
         Member findMember = memberJpaRepository.fineById(member.getId()).get();
         assertThat(findMember).isEqualTo(member);
 
-        List<Member> result1 = memberJpaRepository.findAll();
+        List<Member> result1 = memberJpaRepository.findAll_Querydsl();
         assertThat(result1).containsExactly(member);
 
-        List<Member> result2 = memberJpaRepository.fundByUsername("member1");
+        List<Member> result2 = memberJpaRepository.fundByUsername_Querydsl("member1");
         assertThat(result2).containsExactly(member);
-
 
     }
 
