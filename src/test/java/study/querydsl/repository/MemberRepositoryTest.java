@@ -57,6 +57,7 @@ public class MemberRepositoryTest {
         em.persist(member2);
         em.persist(member3);
         em.persist(member4);
+        em.persist(member5);
 
         MemberSearchCondition condition = new MemberSearchCondition();
         condition.setAgeGoe(35);
