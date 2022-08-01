@@ -13,5 +13,5 @@ public class Hello {
 
     @Id @GeneratedValue
     private Long id;
-    private String belong;
+    private String nickname;
 }
