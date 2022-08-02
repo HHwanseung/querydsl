@@ -97,9 +97,9 @@ public class QuerydslBasicTest {
     @Test
     public void search() {
         Member findMember = queryFactory
-                .selectFrom(QMember.member)
-                .where(QMember.member.username.eq("member1")
-                        .and(QMember.member.age.eq(10)))
+                .selectFrom(member)
+                .where(member.username.eq("member1")
+                        .and(member.age.eq(10)))
                 .fetchOne();
 
         assertThat(findMember.getUsername()).isEqualTo("member1");
@@ -323,7 +323,7 @@ public class QuerydslBasicTest {
 
         Member findMember = queryFactory
                 .selectFrom(member)
-                .where(QMember.member.username.eq("member1"))
+                .where(member.username.eq("member1"))
                 .fetchOne();
 
         boolean loaded = emf.getPersistenceUnitUtil().isLoaded(findMember.getTeam());
@@ -340,7 +340,7 @@ public class QuerydslBasicTest {
         Member findMember = queryFactory
                 .selectFrom(member)
                 .join(member.team, team).fetchJoin()
-                .where(QMember.member.username.eq("member1"))
+                .where(member.username.eq("member1"))
                 .fetchOne();
 
         boolean loaded = emf.getPersistenceUnitUtil().isLoaded(findMember.getTeam());
