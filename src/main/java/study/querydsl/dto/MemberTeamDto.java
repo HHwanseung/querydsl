@@ -11,6 +11,7 @@ public class MemberTeamDto {
     private int age;
     private Long teamId;
     private String teamName;
+    private String belong;
 
     @QueryProjection
     public MemberTeamDto(Long id, String username, int age, Long teamId, String teamName) {
