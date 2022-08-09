@@ -10,6 +10,7 @@ public class MemberDto {
 
     private String username;
     private int age;
+    private String belong;
 
     @QueryProjection
     public MemberDto(String username, int age) {
