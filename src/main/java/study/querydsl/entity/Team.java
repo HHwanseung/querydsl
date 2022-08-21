@@ -18,8 +18,6 @@ public class Team {
     @Id @GeneratedValue
     private Long id;
     private String name;
-    private String teamName;
-    private String alone;
 
     @OneToMany(mappedBy = "team")
     private List<Member> members = new ArrayList<>();
