@@ -15,6 +15,8 @@ public class Member {
     private Long id;
     private String username;
     private int age;
+    private String sex;
+
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "team_id")
