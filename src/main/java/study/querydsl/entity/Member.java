@@ -15,7 +15,7 @@ public class Member {
     private Long id;
     private String username;
     private int age;
-    private String alone;
+
 
 
     @ManyToOne(fetch = FetchType.LAZY)
