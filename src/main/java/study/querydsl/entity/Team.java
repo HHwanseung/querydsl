@@ -26,6 +26,5 @@ public class Team {
         this.name = name;
     }
 
-    private String teamName;
 
 }
